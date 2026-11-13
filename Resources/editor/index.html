@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MarkWrite</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css" />
+<link id="hljs-theme" rel="stylesheet" href="vendor/hljs-light.css" />
+<link rel="stylesheet" href="editor.css" />
+</head>
+<body data-theme="github">
+  <div id="scroller">
+    <div id="page">
+      <div id="editor" contenteditable="true" spellcheck="false" autocorrect="off" autocapitalize="off"></div>
+    </div>
+  </div>
+  <div id="dropmask" class="dropmask">松开以插入图片</div>
+  <div id="findbar" class="findbar">
+    <input id="find-input" type="text" placeholder="查找" />
+    <span id="find-count" class="find-count"></span>
+    <button id="find-prev" title="上一个 (Shift+Enter)">﹀</button>
+    <button id="find-next" title="下一个 (Enter)">︿</button>
+    <div class="find-sep"></div>
+    <input id="replace-input" type="text" placeholder="替换为" />
+    <button id="replace-one" title="替换">替换</button>
+    <button id="replace-all" title="全部替换">全部</button>
+    <div class="find-sep"></div>
+    <button id="find-close" title="关闭 (Esc)">✕</button>
+  </div>
+<script src="vendor/highlight.min.js"></script>
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/mermaid.min.js"></script>
+<script src="editor.js"></script>
+</body>
+</html>

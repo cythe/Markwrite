@@ -1,0 +1,314 @@
+﻿<Window x:Class="MarkWrite.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="MarkWrite" Height="780" Width="1200" MinWidth="680" MinHeight="440"
+        WindowStyle="None" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBg}"
+        FontFamily="Microsoft YaHei UI, Segoe UI"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        AllowDrop="False">
+
+  <shell:WindowChrome.WindowChrome>
+    <shell:WindowChrome CaptionHeight="40" ResizeBorderThickness="6"
+                        GlassFrameThickness="0" CornerRadius="0"
+                        UseAeroCaptionButtons="False" />
+  </shell:WindowChrome.WindowChrome>
+
+  <Window.Resources>
+    <SolidColorBrush x:Key="AppBg" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="PanelBg" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SubBg" Color="#F3F4F6" />
+    <SolidColorBrush x:Key="Fg" Color="#202124" />
+    <SolidColorBrush x:Key="FgMuted" Color="#767676" />
+    <SolidColorBrush x:Key="Line" Color="#E3E4E6" />
+    <SolidColorBrush x:Key="Accent" Color="#0969DA" />
+    <SolidColorBrush x:Key="AccentSoft" Color="#E8F0FE" />
+    <SolidColorBrush x:Key="HoverBg" Color="#EFEFEF" />
+
+    <Style x:Key="FlatBtn" TargetType="Button">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource FgMuted}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="FontFamily" Value="Segoe UI Symbol, Segoe UI" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="4">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBg}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="WinBtn" TargetType="Button" BasedOn="{StaticResource FlatBtn}">
+      <Setter Property="Width" Value="46" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource FgMuted}" />
+    </Style>
+
+    <Style x:Key="SideTab" TargetType="Button">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource FgMuted}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="FontSize" Value="12.5" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBg}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="StatusText" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource FgMuted}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <HierarchicalDataTemplate x:Key="FileNodeTemplate" ItemsSource="{Binding Children}">
+      <StackPanel Orientation="Horizontal" Margin="0,1">
+        <TextBlock Text="{Binding Icon}" FontSize="12" Foreground="{DynamicResource FgMuted}" Margin="0,0,5,0" />
+        <TextBlock Text="{Binding Name}" FontSize="12.5" Foreground="{DynamicResource Fg}" MouseLeftButtonUp="FileNode_Click" />
+      </StackPanel>
+    </HierarchicalDataTemplate>
+
+    <Style x:Key="MenuStyle" TargetType="ContextMenu">
+      <Setter Property="Background" Value="{DynamicResource PanelBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Line}" />
+      <Setter Property="Foreground" Value="{DynamicResource Fg}" />
+      <Setter Property="HasDropShadow" Value="True" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ContextMenu">
+            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="4" Margin="0,4,2,4">
+              <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="MenuItem">
+      <Setter Property="Foreground" Value="{DynamicResource Fg}" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="12,6" />
+      <Setter Property="FontSize" Value="12.5" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="MenuItem">
+            <Grid>
+              <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <ContentPresenter Grid.Column="0" ContentSource="Header" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{TemplateBinding InputGestureText}"
+                             Foreground="{DynamicResource FgMuted}" FontSize="11"
+                             Margin="20,0,0,0" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" x:Name="arrow" Text="&#x203A;"
+                             Foreground="{DynamicResource FgMuted}" FontSize="12"
+                             Margin="8,0,0,0" VerticalAlignment="Center" />
+                </Grid>
+              </Border>
+              <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Right"
+                     IsOpen="{TemplateBinding IsSubmenuOpen}" Focusable="False" PopupAnimation="Fade">
+                <Border Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource Line}"
+                        BorderThickness="1" CornerRadius="8" Padding="4" Margin="2,0,0,0">
+                  <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                </Border>
+              </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBg}" />
+              </Trigger>
+              <Trigger Property="IsSubmenuOpen" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBg}" />
+              </Trigger>
+              <Trigger Property="HasItems" Value="False">
+                <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="Separator">
+      <Setter Property="Height" Value="9" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Separator">
+            <Border Height="1" Background="{DynamicResource Line}" Margin="10,4" />
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
+  <Border BorderBrush="{DynamicResource Line}" BorderThickness="1" Background="{DynamicResource AppBg}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="40" />
+        <RowDefinition Height="34" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="26" />
+      </Grid.RowDefinitions>
+
+      <!-- 顶栏 -->
+      <Grid Grid.Row="0" Background="{DynamicResource AppBg}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8,0,0,0" VerticalAlignment="Center">
+          <Button x:Name="MenuBtn" Content="&#x2630;" Width="32" Height="30" Style="{StaticResource FlatBtn}"
+                  FontSize="15" Click="MenuBtn_Click"
+                  shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="菜单" />
+          <Button x:Name="SidebarToggleBtn" Content="&#x25E7;" Width="32" Height="30" Style="{StaticResource FlatBtn}"
+                  FontSize="15" Click="SidebarToggle_Click"
+                  shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="显示 / 隐藏侧栏" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+          <TextBlock x:Name="TitleText" Text="未命名" FontSize="13.5" FontWeight="SemiBold"
+                     Foreground="{DynamicResource Fg}" VerticalAlignment="Center" />
+          <TextBlock x:Name="DirtyText" Text="" FontSize="13.5" Foreground="{DynamicResource FgMuted}" Margin="3,0,0,0" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button x:Name="MinBtn" Content="&#xE921;" Style="{StaticResource WinBtn}" FontFamily="Segoe MDL2 Assets"
+                  Click="Min_Click" shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="最小化" />
+          <Button x:Name="MaxBtn" Content="&#xE922;" Style="{StaticResource WinBtn}" FontFamily="Segoe MDL2 Assets"
+                  Click="Max_Click" shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="最大化" />
+          <Button x:Name="CloseBtn" Content="&#xE8BB;" Style="{StaticResource WinBtn}" FontFamily="Segoe MDL2 Assets"
+                  Click="Close_Click" shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="关闭" />
+        </StackPanel>
+      </Grid>
+
+      <!-- 标签栏 -->
+      <Border Grid.Row="1" Background="{DynamicResource SubBg}" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1">
+        <Grid>
+          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="6,0">
+            <StackPanel x:Name="TabPanel" Orientation="Horizontal" VerticalAlignment="Center" />
+          </ScrollViewer>
+          <Button x:Name="NewTabBtn" Content="+" Width="26" Height="22" HorizontalAlignment="Right" VerticalAlignment="Center"
+                  Margin="0,0,8,0" Style="{StaticResource FlatBtn}" FontSize="15" Click="NewTab_Click" ToolTip="新建标签 (Ctrl+N)" />
+        </Grid>
+      </Border>
+
+      <!-- 主体 -->
+      <Grid Grid.Row="2">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition x:Name="SideCol" Width="260" MinWidth="0" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" x:Name="SidePanel" Background="{DynamicResource PanelBg}"
+                BorderBrush="{DynamicResource Line}" BorderThickness="0,0,1,0">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="8,8,8,6">
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button x:Name="FilesTabBtn" Content="文件" Style="{StaticResource SideTab}" Click="SideFiles_Click" />
+                <Button x:Name="OutlineTabBtn" Content="大纲" Style="{StaticResource SideTab}" Margin="2,0,0,0" Click="SideOutline_Click" />
+              </StackPanel>
+              <Button x:Name="OpenFolderBtn" Content="&#xE8B7;" Style="{StaticResource FlatBtn}" Width="26" Height="24"
+                      FontFamily="Segoe MDL2 Assets" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"
+                      Click="OpenFolder_Click" ToolTip="打开文件夹" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" x:Name="SideScroll" VerticalScrollBarVisibility="Auto" Padding="6,0,6,12">
+              <StackPanel>
+                <TreeView x:Name="FileTree" Background="Transparent" BorderThickness="0"
+                          ItemTemplate="{StaticResource FileNodeTemplate}"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                  <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                      <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    </Style>
+                  </TreeView.ItemContainerStyle>
+                </TreeView>
+                <ItemsControl x:Name="OutlineList" />
+              </StackPanel>
+            </ScrollViewer>
+          </Grid>
+        </Border>
+
+        <GridSplitter Grid.Column="1" x:Name="SideSplitter" Width="4" HorizontalAlignment="Stretch"
+                      Background="Transparent" ResizeBehavior="PreviousAndNext" />
+
+        <Grid Grid.Column="2" Background="{DynamicResource AppBg}">
+          <wv2:WebView2 x:Name="Web" />
+          <Border x:Name="WelcomeLayer" Background="{DynamicResource AppBg}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+              <TextBlock Text="MarkWrite" FontSize="34" FontWeight="Bold" Foreground="{DynamicResource Fg}" HorizontalAlignment="Center" />
+              <TextBlock Text="所见即所得的 Markdown 编辑器" FontSize="13.5" Foreground="{DynamicResource FgMuted}"
+                         HorizontalAlignment="Center" Margin="0,10,0,0" />
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,26,0,0">
+                <Button Content="新建文档 (Ctrl+N)" Style="{StaticResource SideTab}" Click="NewTab_Click" Margin="0,0,10,0" />
+                <Button Content="打开文件 (Ctrl+O)" Style="{StaticResource SideTab}" Click="OpenFile_Click" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Grid>
+
+      <!-- 状态栏 -->
+      <Border Grid.Row="3" Background="{DynamicResource SubBg}" BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0">
+        <Grid Margin="10,0">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+            <TextBlock x:Name="StatWords" Text="字数 0" Style="{StaticResource StatusText}" />
+            <TextBlock Text="·" Style="{StaticResource StatusText}" Margin="8,0" />
+            <TextBlock x:Name="StatLines" Text="行 0" Style="{StaticResource StatusText}" />
+            <TextBlock Text="·" Style="{StaticResource StatusText}" Margin="8,0" />
+            <TextBlock x:Name="StatChars" Text="字符 0" Style="{StaticResource StatusText}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="ModeBtn" Content="源码" Style="{StaticResource SideTab}" Height="20" Padding="8,0"
+                    FontSize="11.5" Click="ModeBtn_Click" ToolTip="切换 源码 / 所见即所得 (Ctrl+/)" />
+            <TextBlock Text="·" Style="{StaticResource StatusText}" Margin="6,0" />
+            <TextBlock x:Name="StatTheme" Text="github" Style="{StaticResource StatusText}" />
+            <TextBlock Text="·" Style="{StaticResource StatusText}" Margin="8,0" />
+            <TextBlock Text="UTF-8" Style="{StaticResource StatusText}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Window>
